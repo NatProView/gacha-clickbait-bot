@@ -37,6 +37,7 @@ for s in clickbait_subject:
 
 
 # TODO change int casting
+# TODO remake whole clickbait functionality :)
 
 
 class NotAnAdmin(commands.CheckFailure):
@@ -95,11 +96,6 @@ async def repeat(ctx, *arg):
 
 
 @bot.command()
-async def add(ctx, a: int, b: int):
-    await ctx.send(a + b)
-
-
-@bot.command()
 async def clickbait(ctx):
     clickbait = "**" + \
                 random.choice(prefix) + "** " + \
@@ -118,6 +114,9 @@ async def add_trusted(ctx, user: discord.User):
         return
     users_collection.insert_one({"name": user.name, "discordId": user.id, "isAdmin": True})
     users = list(users_collection.find())
+    global admins
+    admins = list(filter(lambda x: x['isAdmin'] is True, users))
+    await ctx.send(f"Hooray! <@{user.id}> has become an admin!")
 
 
 @admin_only()
@@ -125,6 +124,10 @@ async def add_trusted(ctx, user: discord.User):
 async def remove_trusted(ctx, user: discord.User):
     x = users_collection.delete_many({"discordId": int(user.id)})
     if x.deleted_count > 0:
+        global users
+        global admins        
+        users = list(users_collection.find())
+        admins = list(filter(lambda x: x['isAdmin'] is True, users))
         await ctx.send("User successfully deleted from admin list")
     else:
         await ctx.send("Could not delete this user from admin list. Perhaps he wasn't there to begin with?")
