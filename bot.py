@@ -5,6 +5,7 @@ import logging
 from database import get_database
 from random import randrange
 from pymongo import MongoClient
+import subprocess
 
 bot = commands.Bot(command_prefix='$')
 logging.basicConfig(level=logging.INFO)
@@ -125,7 +126,7 @@ async def remove_trusted(ctx, user: discord.User):
     x = users_collection.delete_many({"discordId": int(user.id)})
     if x.deleted_count > 0:
         global users
-        global admins        
+        global admins
         users = list(users_collection.find())
         admins = list(filter(lambda x: x['isAdmin'] is True, users))
         await ctx.send("User successfully deleted from admin list")
@@ -161,3 +162,4 @@ async def my_id(ctx):
 
 
 bot.run(token)
+subprocess.call("./start.sh")
