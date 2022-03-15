@@ -41,6 +41,7 @@ for s in clickbait_subject:
 # TODO remake whole clickbait functionality :)
 
 
+
 class NotAnAdmin(commands.CheckFailure):
     pass
 
@@ -64,7 +65,7 @@ def is_trusted(userid):
 @bot.event
 async def on_ready():
     print(f"Logged in as {bot.user.name}")
-    await bot.get_channel(951619317328392232).send("I'm up and running!")
+    await bot.get_channel(951619317328392232).send("I'm back online!")
 
 
 @commands.is_owner()
@@ -72,6 +73,14 @@ async def on_ready():
 async def shutdown(ctx):
     await ctx.send("I'm leaving, take care!")
     await ctx.bot.logout()
+
+
+@commands.is_owner()
+@bot.command()
+async def restart(ctx):
+    await ctx.send("Restarting...")
+    await ctx.bot.logout()
+    subprocess.call("./start.sh")
 
 
 @shutdown.error
@@ -162,4 +171,4 @@ async def my_id(ctx):
 
 
 bot.run(token)
-subprocess.call("./start.sh")
+
