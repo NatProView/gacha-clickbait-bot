@@ -64,6 +64,7 @@ async def on_ready():
     print(f"Logged in as {bot.user.name}")
     await bot.get_channel(951619317328392232).send("I'm up and running!")
 
+
 @commands.is_owner()
 @bot.command()
 async def shutdown(ctx):
@@ -96,6 +97,15 @@ async def repeat(ctx, *arg):
 @bot.command()
 async def add(ctx, a: int, b: int):
     await ctx.send(a + b)
+
+
+@bot.command()
+async def clickbait(ctx):
+    clickbait = "**" + \
+                random.choice(prefix) + "** " + \
+                random.choice(subject) + " " + \
+                random.choice(activity)
+    await ctx.send(clickbait.upper())
 
 
 @admin_only()
