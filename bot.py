@@ -81,9 +81,9 @@ async def shutdown(ctx):
 @bot.command()
 async def restart(ctx):
     await ctx.send("Restarting...")
-    await ctx.bot.logout()
     with open('channel', 'w') as f:
         f.write(ctx.channel.id)
+    await ctx.bot.logout()
     subprocess.call("./start.sh")
 
 
