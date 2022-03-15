@@ -13,8 +13,27 @@ token = file.read()
 file.close()
 dbname = get_database()
 users_collection = dbname["User"]
+clickbait_prefix_collection = dbname['Prefix']
+clickbait_subject_collection = dbname['Subject']
+clickbait_activity_collection = dbname['Activity']
+
 users = list(users_collection.find())
 admins = list(filter(lambda x: x['isAdmin'] is True, users))
+
+clickbait_prefix = list(clickbait_prefix_collection.find())
+clickbait_activity = list(clickbait_activity_collection.find())
+clickbait_subject = list(clickbait_subject_collection.find())
+prefix = []
+activity = []
+subject = []
+for p in clickbait_prefix:
+    prefix.append(p['text'])
+
+for a in clickbait_activity:
+    activity.append(a['text'])
+
+for s in clickbait_subject:
+    subject.append(s['text'])
 
 
 # TODO change int casting
@@ -44,9 +63,6 @@ def is_trusted(userid):
 async def on_ready():
     print(f"Logged in as {bot.user.name}")
     await bot.get_channel(951619317328392232).send("I'm up and running!")
-    for admin in admins:
-        print(admin['name'])
-
 
 @commands.is_owner()
 @bot.command()
