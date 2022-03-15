@@ -2,32 +2,133 @@ import discord
 from discord.ext import commands
 import random
 import logging
-from pymongo_test_insert import get_database
+from database import get_database
+from random import randrange
+from pymongo import MongoClient
 
+bot = commands.Bot(command_prefix='$')
 logging.basicConfig(level=logging.INFO)
 file = open("token", "r")
 token = file.read()
 file.close()
-class MyClient(discord.Client):
-    async def on_ready(self):
-        print('Logged on as {0}!'.format(self.user))
+dbname = get_database()
+users_collection = dbname["User"]
+users = list(users_collection.find())
+admins = list(filter(lambda x: x['isAdmin'] is True, users))
 
-    async def on_message(self, message):
-        if message.author == client.user:
-            return
-        
-        if message.content.lower().startsWith("$cadence"):
-            await message.channel.send("Yes, it is me~")
-        
-        if message.content.lower().startswith('$ping'):
-            await message.channel.send('pong')
 
-        if message.content.lower().startswith('$pong'):
-            await message.channel.send('ping')
+# TODO change int casting
 
-        #if message.content.lower().startswith("$trusted add "):
 
-        print('Message from {0.author}: {0.content}'.format(message))
+class NotAnAdmin(commands.CheckFailure):
+    pass
 
-client = MyClient()
-client.run(token)
+
+def admin_only():
+    async def predicate(ctx):
+        if users_collection.find_one({"discordId": int(ctx.author.id), "isAdmin": True}) is None:
+            raise NotAnAdmin("Hey, you're not an admin!")
+        return True
+
+    return commands.check(predicate)
+
+
+def is_trusted(userid):
+    if users_collection.find_one({"discordId": int(userid), "isAdmin": True}) is None:
+        return False
+    else:
+        return True
+
+
+@bot.event
+async def on_ready():
+    print(f"Logged in as {bot.user.name}")
+    await bot.get_channel(951619317328392232).send("I'm up and running!")
+    for admin in admins:
+        print(admin['name'])
+
+
+@commands.is_owner()
+@bot.command()
+async def shutdown(ctx):
+    await ctx.send("I'm leaving, take care!")
+    await ctx.bot.logout()
+
+
+@shutdown.error
+async def shutdown_error(ctx, error):
+    await ctx.send(error)
+
+
+@bot.command()
+@admin_only()
+async def check(ctx):
+    await ctx.send("Yup, you can use this command!")
+
+
+@check.error
+async def check_error(ctx, error):
+    if isinstance(error, NotAnAdmin):
+        await ctx.send(error)
+
+
+@bot.command()
+async def repeat(ctx, *arg):
+    await ctx.send(arg)
+
+
+@bot.command()
+async def add(ctx, a: int, b: int):
+    await ctx.send(a + b)
+
+
+@admin_only()
+@bot.command(name="trusted_add")
+async def add_trusted(ctx, user: discord.User):
+    global users
+    users = list(users_collection.find())
+    if is_trusted(user.id) is True:
+        await ctx.send("This user is already an admin! :)")
+        return
+    users_collection.insert_one({"name": user.name, "discordId": user.id, "isAdmin": True})
+    users = list(users_collection.find())
+
+
+@admin_only()
+@bot.command(name="trusted_remove")
+async def remove_trusted(ctx, user: discord.User):
+    x = users_collection.delete_many({"discordId": int(user.id)})
+    if x.deleted_count > 0:
+        await ctx.send("User successfully deleted from admin list")
+    else:
+        await ctx.send("Could not delete this user from admin list. Perhaps he wasn't there to begin with?")
+
+
+@admin_only()
+@bot.command(name="trusted_list")
+async def trusted_list(ctx):
+    msg = "**Admins:** "
+    for admin in admins:
+        msg += admin['name'] + " | "
+    await ctx.send(msg)
+
+
+@bot.command(name="trusted_check")
+async def trusted_check(ctx):
+    await ctx.send(list(users_collection.find({"discordId": int(ctx.author.id), "isAdmin": True})))
+
+
+@add_trusted.error
+@remove_trusted.error
+@trusted_list.error
+async def not_an_admin_error(ctx, error):
+    if isinstance(error, NotAnAdmin):
+        await ctx.send(error)
+
+
+@bot.command(name="myid")
+async def my_id(ctx):
+    await ctx.send(ctx.author.id)
+
+
+bot.run(token)
