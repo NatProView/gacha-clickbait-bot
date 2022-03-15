@@ -73,7 +73,7 @@ async def on_ready():
 async def shutdown(ctx):
     await ctx.send("I'm leaving, take care!")
     with open('channel', 'w') as f:
-        f.write(ctx.channel.id)
+        f.write(str(ctx.channel.id))
     await ctx.bot.logout()
 
 
@@ -82,7 +82,7 @@ async def shutdown(ctx):
 async def restart(ctx):
     await ctx.send("Restarting...")
     with open('channel', 'w') as f:
-        f.write(ctx.channel.id)
+        f.write(str(ctx.channel.id))
     await ctx.bot.logout()
     subprocess.call("./start.sh")
 
