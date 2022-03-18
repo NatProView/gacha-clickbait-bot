@@ -7,11 +7,11 @@ from random import randrange
 from pymongo import MongoClient
 import subprocess
 
+
 bot = commands.Bot(command_prefix='$')
 logging.basicConfig(level=logging.INFO)
-file = open("token", "r")
-token = file.read()
-file.close()
+with open("token", "r") as file:
+    token = file.read()
 dbname = get_database()
 users_collection = dbname["User"]
 clickbait_prefix_collection = dbname['Prefix']
@@ -66,7 +66,6 @@ async def on_ready():
     print(f"Logged in as {bot.user.name}")
     with open('channel', 'r') as f:
         await bot.get_channel(int(f.readline())).send("I'm back online!")
-
 
 @commands.is_owner()
 @bot.command()
