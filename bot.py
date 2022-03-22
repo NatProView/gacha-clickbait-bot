@@ -6,7 +6,7 @@ from database import get_database
 from random import randrange
 from pymongo import MongoClient
 import subprocess
-
+import scraper
 
 bot = commands.Bot(command_prefix='$')
 logging.basicConfig(level=logging.INFO)
@@ -67,6 +67,7 @@ async def on_ready():
     with open('channel', 'r') as f:
         await bot.get_channel(int(f.readline())).send("I'm back online!")
 
+
 @commands.is_owner()
 @bot.command()
 async def shutdown(ctx):
@@ -74,6 +75,21 @@ async def shutdown(ctx):
     with open('channel', 'w') as f:
         f.write(str(ctx.channel.id))
     await ctx.bot.logout()
+
+
+@bot.command(name="temp")
+async def temperature(ctx):
+    await ctx.send(f"Current temperature in Gdańsk: {scraper.get_temperature()}°C")
+
+
+@bot.command()
+async def weather(ctx):
+    weather_dict = scraper.get_weather()
+    msg = "**Currently in Gdańsk:**\n" + \
+          "**Temperature:** " + weather_dict.get("temperature") + " °C | " + \
+          "**Humidity:** " + weather_dict.get('humidity') + " % | " + \
+          "**Pressure:** " + weather_dict.get("pressure") + " hPa"
+    await ctx.send(msg)
 
 
 @commands.is_owner()
@@ -174,4 +190,3 @@ async def my_id(ctx):
 
 
 bot.run(token)
-
