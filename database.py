@@ -1,11 +1,8 @@
 def get_database():
     from pymongo import MongoClient
+    import os
 
-    credentials_file = open("mongodb-credentials", 'r')
-    connection_string = credentials_file.read()
-    credentials_file.close()
-
-    client = MongoClient(connection_string)
+    client = MongoClient(os.environ.get('MONGODB_CONNECTION_STRING'))
 
     return client['gacha-bot']
 
