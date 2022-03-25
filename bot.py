@@ -5,13 +5,15 @@ import logging
 from database import get_database
 from random import randrange
 from pymongo import MongoClient
+import os
+from dotenv import load_dotenv
 import subprocess
 import scraper
 
+load_dotenv()
+
 bot = commands.Bot(command_prefix='$')
 logging.basicConfig(level=logging.INFO)
-with open("token", "r") as file:
-    token = file.read()
 dbname = get_database()
 users_collection = dbname["User"]
 clickbait_prefix_collection = dbname['Prefix']
@@ -189,4 +191,4 @@ async def my_id(ctx):
     await ctx.send(ctx.author.id)
 
 
-bot.run(token)
+bot.run(os.environ.get('DISCORD_TOKEN'))
