@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 import random
+import re
 import logging
 from database import get_database
 from random import randrange
@@ -83,6 +84,18 @@ async def shutdown(ctx):
 async def temperature(ctx):
     await ctx.send(f"Current temperature in Gdańsk: {scraper.get_temperature()}°C")
 
+
+@bot.command(name="roll")
+async def dice_roll(ctx, arg):
+    matched = re.match(r"(?P<number_of_times>\d+)d(?P<dice_number>\d+)", arg)
+    if matched == None:
+        await ctx.send("It's not a correct dice. :<")
+        return
+    matched = matched.groupdict()
+    rolls = random.sample(range(1, int(matched["dice_number"])), int(matched["number_of_times"]))
+    rolls_list = " ".join(str(roll) for roll in rolls)
+    message = "Rolled: {} | Sum: {}".format(rolls_list, sum(rolls))
+    await ctx.send(message)
 
 @bot.command()
 async def weather(ctx):
