@@ -85,6 +85,7 @@ async def temperature(ctx):
     await ctx.send(f"Current temperature in Gdańsk: {scraper.get_temperature()}°C")
 
 
+# TODO dodac error handling z dekoratorami
 @bot.command(name="roll")
 async def dice_roll(ctx, arg):
     matched = re.match(r"(?P<number_of_times>\d+)d(?P<dice_number>\d+)", arg)
@@ -94,6 +95,9 @@ async def dice_roll(ctx, arg):
     matched = matched.groupdict()
     matched['number_of_times'] = int(matched['number_of_times'])
     matched['dice_number'] = int(matched['dice_number'])
+    if matched['number_of_times'] < 1 or matched['dice_number'] < 1:
+        await ctx.send("It's not a correct dice :<")
+        return
     rolls = []
     for x in range(matched['number_of_times']):
         random_throw = randrange(matched['dice_number']) + 1

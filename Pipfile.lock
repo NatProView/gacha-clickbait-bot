@@ -1,11 +1,11 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "d91c075d1a64c26ab0eea2e836ad236e770d7ae32263aba5e87bb10e344a1410"
+            "sha256": "5af124b3520d984130324d2622e54448d76a9e71a3a170524e32521062675db1"
         },
         "pipfile-spec": 6,
         "requires": {
-            "python_version": "3.10"
+            "python_version": "3"
         },
         "sources": [
             {
@@ -91,6 +91,13 @@
             "index": "pypi",
             "version": "==1.7.3"
         },
+        "dnspython": {
+            "hashes": [
+                "sha256:0f7569a4a6ff151958b64304071d370daa3243d15941a7beedf0c9fe5105603e",
+                "sha256:a851e51367fb93e9e1361732c1d60dab63eff98712e503ea7d92e6eccb109b4f"
+            ],
+            "version": "==2.2.1"
+        },
         "idna": {
             "hashes": [
                 "sha256:84d9dd047ffa80596e0f246e2eab0b391788b0503584e8945f2368256d2735ff",
@@ -165,6 +172,9 @@
             "version": "==6.0.2"
         },
         "pymongo": {
+            "extras": [
+                "srv"
+            ],
             "hashes": [
                 "sha256:019a386dfa4eaddb067274a32a0a7aa1bcad4d0fff15e92cb46ffe58321bc9ae",
                 "sha256:076e96bbedc34df1e55b0682a13510d2ef1317ea4758ebe9c0388b39c5f60f17",
