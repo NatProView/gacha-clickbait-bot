@@ -89,13 +89,19 @@ async def temperature(ctx):
 async def dice_roll(ctx, arg):
     matched = re.match(r"(?P<number_of_times>\d+)d(?P<dice_number>\d+)", arg)
     if matched == None:
-        await ctx.send("It's not a correct dice. :<")
+        await ctx.send("It's not a correct dice  :<")
         return
     matched = matched.groupdict()
-    rolls = random.sample(range(1, int(matched["dice_number"])), int(matched["number_of_times"]))
-    rolls_list = " ".join(str(roll) for roll in rolls)
-    message = "Rolled: {} | Sum: {}".format(rolls_list, sum(rolls))
+    matched['number_of_times'] = int(matched['number_of_times'])
+    matched['dice_number'] = int(matched['dice_number'])
+    rolls = []
+    for x in range(matched['number_of_times']):
+        random_throw = randrange(matched['dice_number']) + 1
+        rolls.append(random_throw)
+    rolls_list = ', '.join(str(roll) for roll in rolls)
+    message = "Rolled: {} | **Sum: {}**".format(rolls_list, sum(rolls))
     await ctx.send(message)
+
 
 @bot.command()
 async def weather(ctx):
