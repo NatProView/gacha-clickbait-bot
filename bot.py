@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands
 import random
-import re
 import logging
 from database import get_database
 from random import randrange
@@ -10,7 +9,8 @@ import os
 from dotenv import load_dotenv
 import subprocess
 import scraper
-
+import time
+import re
 load_dotenv()
 
 bot = commands.Bot(command_prefix='$')
@@ -23,6 +23,8 @@ clickbait_activity_collection = dbname['Activity']
 
 users = list(users_collection.find())
 admins = list(filter(lambda x: x['isAdmin'] is True, users))
+starttime = time.time()
+limit = 50
 
 clickbait_prefix = list(clickbait_prefix_collection.find())
 clickbait_activity = list(clickbait_activity_collection.find())
@@ -64,11 +66,22 @@ def is_trusted(userid):
         return True
 
 
+# async def check_temp():
+#     while True:
+#         temp = float(subprocess.getoutput('vcgencmd measure_temp | egrep -o \'[0-9]*\.[0-9]*\''))
+#         if temp > limit:
+#             dif = temp - limit
+#             user = await bot.fetch_user(178094529008762880)
+#             await user.send(f"The temperature is {dif:.{3}} above limit [{temp}/{limit}]")
+#         time.sleep(300.0 - ((time.time() - starttime) % 300.0))
+
+
 @bot.event
 async def on_ready():
     print(f"Logged in as {bot.user.name}")
     with open('channel', 'r') as f:
         await bot.get_channel(int(f.readline())).send("I'm back online!")
+    # await check_temp()
 
 
 @commands.is_owner()
@@ -80,9 +93,11 @@ async def shutdown(ctx):
     await ctx.bot.logout()
 
 
+@commands.is_owner()
 @bot.command(name="temp")
 async def temperature(ctx):
-    await ctx.send(f"Current temperature in Gdańsk: {scraper.get_temperature()}°C")
+    temp = subprocess.getoutput('vcgencmd measure_temp | egrep -o \'[0-9]*\.[0-9]*\'')
+    await ctx.send(f"Machine temperature: **{temp}**")
 
 
 # TODO dodac error handling z dekoratorami
